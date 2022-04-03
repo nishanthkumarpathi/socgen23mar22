@@ -1,0 +1,12 @@
+---
+    - name: Install Database
+      apt: name={{ item }} state=present
+      with_items:
+        - mysql-server
+        - mysql-client
+
+    - name: Start MySQL Service
+      service:
+        name: mysql
+        state: started
+        enabled: yes

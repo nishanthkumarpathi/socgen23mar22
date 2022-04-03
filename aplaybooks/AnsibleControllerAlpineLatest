@@ -1,0 +1,36 @@
+FROM alpine:latest
+
+RUN \
+ apk update && \
+    apk add --no-cache ansible bash curl wget openssh sshpass tar py3-pip && \
+    pip install --upgrade pip && \
+    rm -rf /tmp/* && \
+rm -rf /var/cache/apk/*
+
+# Makes the Ansible directories
+RUN mkdir /etc/ansible /ansible
+RUN mkdir ~/.ssh
+
+# Over rides SSH Hosts Checking
+RUN echo "host *" >> ~/.ssh/config &&\
+    echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+RUN echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+
+# Makes a directory for ansible playbooks
+RUN mkdir -p /ansible/playbooks
+# Makes the playbooks directory the working directory
+WORKDIR /ansible/playbooks
+
+# Sets environment variables
+ENV ANSIBLE_GATHERING smart
+ENV ANSIBLE_HOST_KEY_CHECKING False
+ENV ANSIBLE_RETRY_FILES_ENABLED False
+ENV ANSIBLE_ROLES_PATH /ansible/playbooks/roles
+ENV ANSIBLE_SSH_PIPELINING True
+ENV PATH /ansible/bin:$PATH
+ENV PYTHONPATH /ansible/lib
+
+EXPOSE 22
+
+CMD ["/bin/sh"]

@@ -1,0 +1,10 @@
+---
+    - name: Install all the required dependencies
+      apt: name={{ item }} state=present
+      with_items:
+        - python3
+        - python-setuptools
+        - python-dev
+        - build-essential
+        - python3-pip
+

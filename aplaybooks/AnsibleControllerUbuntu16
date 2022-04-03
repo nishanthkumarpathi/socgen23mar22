@@ -1,0 +1,39 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y openssh-server ansible sshpass
+RUN mkdir /var/run/sshd
+RUN echo 'root:root' | chpasswd
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+
+RUN mkdir ~/.ssh
+
+# Over rides SSH Hosts Checking
+RUN echo "host *" >> ~/.ssh/config &&\
+    echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+RUN echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+
+# Makes a directory for ansible playbooks
+RUN mkdir -p /ansible/playbooks
+# Makes the playbooks directory the working directory
+WORKDIR /ansible/playbooks
+
+# Sets environment variables
+ENV ANSIBLE_GATHERING smart
+ENV ANSIBLE_HOST_KEY_CHECKING False
+ENV ANSIBLE_RETRY_FILES_ENABLED False
+ENV ANSIBLE_ROLES_PATH /ansible/playbooks/roles
+ENV ANSIBLE_SSH_PIPELINING True
+ENV PATH /ansible/bin:$PATH
+ENV PYTHONPATH /ansible/lib
+
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

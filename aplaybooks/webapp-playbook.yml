@@ -1,0 +1,12 @@
+---
+- name: Deploy a Web Application
+  hosts: targetserver1
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - flask_web
+    - mysql_db
+
+
+
+    
