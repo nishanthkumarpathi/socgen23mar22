@@ -9,16 +9,25 @@ terraform {
 
 provider "docker" {}
 
-resource "docker_image" "nginx" {
-  name         = "nginx:latest"
+resource "docker_image" "targetserver" {
+  name         = "nishanthkp/targetserver:ubuntu16"
   keep_locally = false
 }
 
-resource "docker_container" "nginx" {
-  image = docker_image.nginx.latest
-  name  = "tutorial"
+resource "docker_container" "web_server" {
+  image = docker_image.targetserver.name
+  name  = "web_server"
   ports {
-    internal = 80
-    external = 8000
+    internal = 5000
+    external = 5000
+  }
+}
+
+resource "docker_container" "db_server" {
+  image = docker_image.targetserver.name
+  name  = "db_server"
+  ports {
+    internal = 3306
+    external = 3306
   }
 }

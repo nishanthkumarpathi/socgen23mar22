@@ -1,0 +1,14 @@
+output "web_container_id" {
+  description = "ID of the Docker container"
+  value       = docker_container.web_server.id
+}
+
+output "db_container_id" {
+  description = "ID of the Docker container"
+  value       = docker_container.db_server.id
+}
+
+output "image_id" {
+  description = "ID of the Docker image"
+  value       = docker_image.targetserver.id
+}
