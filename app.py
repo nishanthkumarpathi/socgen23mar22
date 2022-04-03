@@ -1,25 +1,44 @@
-from markupsafe import escape
-from flask import Flask, abort, render_template
+# -------------------------------------------------
+#
+# This is the web application code. DO NOT MODIFY
+#
+# -------------------------------------------------
 
+from flask import Flask
+from flask.ext.mysql import MySQL
 app = Flask(__name__)
 
-@app.route('/')
-def hello_geek():
-    return '<h1>Hello from Flask & Docker</h2>'
+mysql = MySQL()
 
-@app.route('/capitalize/<word>/')
-def capitalize(word):
-    return '<h1>{}</h1>'.format(escape(word.capitalize()))
+# MySQL configurations
+app.config['MYSQL_DATABASE_USER'] = 'db_user'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Passw0rd'
+app.config['MYSQL_DATABASE_DB'] = 'employee_db'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
 
+conn = mysql.connect()
 
-@app.route('/users/<int:user_id>/')
-def greet_user(user_id):
-    users = ['Bob', 'Jane', 'Adam']
-    try:
-        return '<h2>Hi {}</h2>'.format(users[user_id])
-    except IndexError:
-        abort(404)
+cursor = conn.cursor()
 
+@app.route("/")
+def main():
+    return "Welcome!"
+
+@app.route('/how are you')
+def hello():
+    return 'I am good, how about you?'
+
+@app.route('/read from database')
+def read():
+    cursor.execute("SELECT * FROM employees")
+    row = cursor.fetchone()
+    result = []
+    while row is not None:
+      result.append(row[0])
+      row = cursor.fetchone()
+
+    return ",".join(result)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
