@@ -1,4 +1,4 @@
-output "web_container_id" {
+output "web_server_IPAddress" {
   description = "ID of the Docker container"
   value       = docker_container.web_server.id
 }
